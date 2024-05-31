@@ -1,20 +1,20 @@
-# x-superset-depends-on: &superset-depends-on
-#   - db
-#   - superset-redis
-# x-superset-user: &superset-user root
-# x-superset-volumes: &superset-volumes
-#   # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
-#   - ./superset/docker:/app/docker
-#   - ./superset/superset:/app/superset
-#   - ./superset/superset-frontend:/app/superset-frontend
-#   - superset_home:/app/superset_home
-#   - ./superset/tests:/app/tests
+x-superset-depends-on: &superset-depends-on
+  - db
+  - superset-redis
+x-superset-user: &superset-user root
+x-superset-volumes: &superset-volumes
+  # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
+  - ./superset/docker:/app/docker
+  - ./superset/superset:/app/superset
+  - ./superset/superset-frontend:/app/superset-frontend
+  - superset_home:/app/superset_home
+  - ./superset/tests:/app/tests
 
-# x-common-build: &common-build
-#   context: ./superset/
-#   target: dev
-#   cache_from:
-#     - apache/superset-cache:3.10-slim-bookworm
+x-common-build: &common-build
+  context: ./superset/
+  target: dev
+  cache_from:
+    - apache/superset-cache:3.10-slim-bookworm
 
 
 version: '3.7'
@@ -135,149 +135,149 @@ services:
   
 # #superset configuration
 
-  # nginx:
-  #     image: nginx:latest
-  #     container_name: superset_nginx
-  #     restart: unless-stopped
-  #     ports:
-  #       - "80:80"
-  #     extra_hosts:
-  #       - "host.docker.internal:host-gateway"
-  #     volumes:
-  #       - ./superset/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  nginx:
+      image: nginx:latest
+      container_name: superset_nginx
+      restart: unless-stopped
+      ports:
+        - "80:80"
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      volumes:
+        - ./superset/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
-  # superset-redis:
-  #   image: redis:7
-  #   container_name: superset_cache
-  #   restart: unless-stopped
-  #   volumes:
-  #     - superset_redis:/data
+  superset-redis:
+    image: redis:7
+    container_name: superset_cache
+    restart: unless-stopped
+    volumes:
+      - superset_redis:/data
 
-  # db:
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   image: postgres:15
-  #   ports:
-  #   - 5432
-  #   container_name: db
-  #   restart: unless-stopped
-  #   volumes:
-  #     - superset_db_home:/var/lib/postgresql/data
-  #     - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-  # superset:
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   build:
-  #     <<: *common-build
-  #   image: my-superset:latest
-  #   container_name: superset_app
-  #   command: ["/app/docker/docker-bootstrap.sh", "app"]
-  #   user: *superset-user
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8088:8088
-  #   links: *superset-depends-on
-  #   volumes: *superset-volumes
-  #   environment:
-  #     CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
+  db:
+    env_file:
+      - superset/docker/.env # default
+    image: postgres:15
+    ports:
+    - 5432
+    container_name: db
+    restart: unless-stopped
+    volumes:
+      - superset_db_home:/var/lib/postgresql/data
+      - ./superset/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+  superset:
+    env_file:
+      - superset/docker/.env # default
+    build:
+      <<: *common-build
+    image: my-superset:latest
+    container_name: superset_app
+    command: ["/app/docker/docker-bootstrap.sh", "app"]
+    user: *superset-user
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    ports:
+      - 8088:8088
+    links: *superset-depends-on
+    volumes: *superset-volumes
+    environment:
+      CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
 
-  # superset-websocket:
-  #   container_name: superset_websocket
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   build: ./superset/superset-websocket
-  #   ports:
-  #     - '8081:8080'
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   links:
-  #     - superset-redis
-  #   # Mount everything in superset-websocket into container and
-  #   # then exclude node_modules and dist with bogus volume mount.
-  #   # This is necessary because host and container need to have
-  #   # their own, separate versions of these files. .dockerignore
-  #   # does not seem to work when starting the service through
-  #   # docker compose.
-  #   #
-  #   # For example, node_modules may contain libs with native bindings.
-  #   # Those bindings need to be compiled for each OS and the container
-  #   # OS is not necessarily the same as host OS.
-  #   volumes:
-  #     - ./superset/superset-websocket:/home/superset-websocket
-  #     - /home/superset-websocket/node_modules
-  #     - /home/superset-websocket/dist
+  superset-websocket:
+    container_name: superset_websocket
+    env_file:
+      - superset/docker/.env # default
+    build: ./superset/superset-websocket
+    ports:
+      - '8081:8080'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    links:
+      - superset-redis
+    # Mount everything in superset-websocket into container and
+    # then exclude node_modules and dist with bogus volume mount.
+    # This is necessary because host and container need to have
+    # their own, separate versions of these files. .dockerignore
+    # does not seem to work when starting the service through
+    # docker compose.
+    #
+    # For example, node_modules may contain libs with native bindings.
+    # Those bindings need to be compiled for each OS and the container
+    # OS is not necessarily the same as host OS.
+    volumes:
+      - ./superset/superset-websocket:/home/superset-websocket
+      - /home/superset-websocket/node_modules
+      - /home/superset-websocket/dist
 
-  #     # Mounting a config file that contains a dummy secret required to boot up.
-  #     # do not use this docker-compose in production
-  #     - ./superset/docker/superset-websocket/config.json:/home/superset-websocket/config.json
+      # Mounting a config file that contains a dummy secret required to boot up.
+      # do not use this docker-compose in production
+      - ./superset/docker/superset-websocket/config.json:/home/superset-websocket/config.json
 
 
-  # superset-init:
-  #   build:
-  #     <<: *common-build
-  #   image: my-superset:latest
-  #   container_name: superset_init
-  #   command: ["/app/docker/docker-init.sh"]
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   links: *superset-depends-on
-  #   user: *superset-user
-  #   volumes: *superset-volumes
-  #   healthcheck:
-  #     disable: true
-  #   environment:
-  #     CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
+  superset-init:
+    build:
+      <<: *common-build
+    image: my-superset:latest
+    container_name: superset_init
+    command: ["/app/docker/docker-init.sh"]
+    env_file:
+      - superset/docker/.env # default
+    links: *superset-depends-on
+    user: *superset-user
+    volumes: *superset-volumes
+    healthcheck:
+      disable: true
+    environment:
+      CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
 
-  # superset-node:
-  #   image: node:18
-  #   environment:
-  #     # set this to false if you have perf issues running the npm i; npm run dev in-docker
-  #     # if you do so, you have to run this manually on the host, which should perform better!
-  #     SCARF_ANALYTICS: "${SCARF_ANALYTICS:-}"
-  #   container_name: superset_node
-  #   command: ["/app/docker/docker-frontend.sh"]
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   links: *superset-depends-on
-  #   volumes: *superset-volumes
+  superset-node:
+    image: node:18
+    environment:
+      # set this to false if you have perf issues running the npm i; npm run dev in-docker
+      # if you do so, you have to run this manually on the host, which should perform better!
+      SCARF_ANALYTICS: "${SCARF_ANALYTICS:-}"
+    container_name: superset_node
+    command: ["/app/docker/docker-frontend.sh"]
+    env_file:
+      - superset/docker/.env # default
+    links: *superset-depends-on
+    volumes: *superset-volumes
 
-  # superset-worker:
-  #   build:
-  #     <<: *common-build
-  #   image: my-superset:latest
-  #   container_name: superset_worker
-  #   command: ["/app/docker/docker-bootstrap.sh", "worker"]
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   restart: unless-stopped
-  #   links: *superset-depends-on
-  #   user: *superset-user
-  #   volumes: *superset-volumes
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD-SHELL",
-  #         "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
-  #       ]
+  superset-worker:
+    build:
+      <<: *common-build
+    image: my-superset:latest
+    container_name: superset_worker
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    env_file:
+      - superset/docker/.env # default
+    restart: unless-stopped
+    links: *superset-depends-on
+    user: *superset-user
+    volumes: *superset-volumes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
+        ]
 
-  # superset-worker-beat:
-  #   build:
-  #     <<: *common-build
-  #   image: my-superset:latest
-  #   container_name: superset_worker_beat
-  #   command: ["/app/docker/docker-bootstrap.sh", "beat"]
-  #   env_file:
-  #     - superset/docker/.env # default
-  #   restart: unless-stopped
-  #   links: *superset-depends-on
-  #   user: *superset-user
-  #   volumes: *superset-volumes
-  #   healthcheck:
-  #     disable: true
+  superset-worker-beat:
+    build:
+      <<: *common-build
+    image: my-superset:latest
+    container_name: superset_worker_beat
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    env_file:
+      - superset/docker/.env # default
+    restart: unless-stopped
+    links: *superset-depends-on
+    user: *superset-user
+    volumes: *superset-volumes
+    healthcheck:
+      disable: true
 
 
 volumes:
@@ -292,12 +292,12 @@ volumes:
     driver: local
   netbox-scripts-files:
     driver: local
-  # superset_home:
-  #   external: false
-  # superset_db_home:
-  #   external: false
-  # superset_redis:
-  #   external: false
+  superset_home:
+    external: false
+  superset_db_home:
+    external: false
+  superset_redis:
+    external: false
 
 
 

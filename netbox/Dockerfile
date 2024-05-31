@@ -21,7 +21,9 @@ RUN chown --recursive netbox /opt/netbox/netbox/media/ && \
     chown --recursive netbox /opt/netbox/netbox/scripts/
 
 # #for netbox topology views images
-# RUN mkdir -p /opt/netbox/netbox/static/netbox_topology_views/img
+RUN mkdir -p /opt/netbox/netbox/static/netbox_topology_views/img
+RUN chown -R netbox:netbox /opt/netbox/netbox/static/
+
 
 # Copy the configuration example to the actual configuration
 #RUN cp /opt/netbox/netbox/netbox/configuration.py /opt/netbox/netbox/netbox/configuration.py
