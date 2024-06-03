@@ -144,19 +144,19 @@ METRICS_ENABLED = False
 
 # Enable installed plugins. Add the name of each plugin to the list.
 PLUGINS = [
-    "netbox_dns",
-    "netbox_topology_views",
-    "netbox_floorplan",
+    # "netbox_dns",
+    # "netbox_topology_views",
+    # "netbox_floorplan",
 ]
 
 # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
 PLUGINS_CONFIG = {
-    'netbox_topology_views': {
-        'static_image_directory': 'netbox_topology_views/img',
-        'allow_coordinates_saving': True,
-        'always_save_coordinates': True
-    }
+    # 'netbox_topology_views': {
+    #     'static_image_directory': 'netbox_topology_views/img',
+    #     'allow_coordinates_saving': True,
+    #     'always_save_coordinates': True
+    # }
 }
 
 # Remote authentication support

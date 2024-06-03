@@ -25,7 +25,7 @@ services:
       - netbox-redis:netbox-redis
       - redis-cache:redis-cache
     build: ./netbox/
-    image: my-netbox:latest
+    image: netbox-without-plugin:v4.0.0
     env_file: ./netbox/env/netbox.env
     user: 'netbox:root'
     healthcheck:

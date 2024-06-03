@@ -51,19 +51,19 @@ else
   echo "Skipping local dependencies (local_requirements.txt not found)"
 fi
 
-#floorplan dependency
-COMMAND="pip install ./netbox-floorplan-plugin"
-echo "Installing manual floorplan plugin  ($COMMAND)..."
-eval $COMMAND || {
-  echo "Floor plan installation failed"
-}
+# #floorplan dependency
+# COMMAND="pip install ./netbox-floorplan-plugin"
+# echo "Installing manual floorplan plugin  ($COMMAND)..."
+# eval $COMMAND || {
+#   echo "Floor plan installation failed"
+# }
 
-#topology view  dependency
-COMMAND="pip install ./netbox-topology-views"
-echo "Installing manual topology view plugin  ($COMMAND)..."
-eval $COMMAND || {
-  echo "Topology view installation failed"
-}
+# #topology view  dependency
+# COMMAND="pip install ./netbox-topology-views"
+# echo "Installing manual topology view plugin  ($COMMAND)..."
+# eval $COMMAND || {
+#   echo "Topology view installation failed"
+# }
 
 
 
